@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bakery Idle</title>
+<style>
+:root{--bg:#1d1530;--card:#2a2045;--card2:#372b5a;--tx:#fff6e6;--bt:#ffd86b;--em:#ff6b4a;--mint:#6ee7b7}
+*{box-sizing:border-box;margin:0}
+body{font-family:ui-rounded,"SF Pro Rounded",Nunito,"Trebuchet MS",sans-serif;background:radial-gradient(circle at 25% -10%,#4a2f7a,var(--bg) 60%) fixed;color:var(--tx);min-height:100vh;overflow-x:hidden;user-select:none}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px}
+h1{font-size:1.35rem;font-weight:800}
+.ib{width:40px;height:40px;margin-left:8px;border:0;border-radius:12px;background:var(--card);color:inherit;font-size:1.1rem;cursor:pointer;transition:.2s}
+.ib:hover{transform:translateY(-2px);background:var(--card2)}
+button:focus-visible{outline:3px solid var(--bt);outline-offset:2px}
+#hint{margin:0 20px;padding:10px 14px;border:1px dashed var(--bt);border-radius:12px;background:#ffd86b1f;font-size:.92rem;animation:pulse 2.6s infinite}
+main{display:grid;grid-template-columns:1fr 420px;gap:22px;max-width:1100px;margin:auto;padding:20px}
+.left{text-align:center}
+#bread{font-size:3.2rem;font-weight:800;line-height:1.1}
+.sub{opacity:.8;min-height:1.3em}
+#buffs{min-height:1.6em;font-weight:800;color:var(--em)}
+#bake{width:230px;height:230px;margin:6px 0;border:0;border-radius:50%;font-size:8rem;line-height:1;cursor:pointer;background:radial-gradient(circle,#ffd86b44,transparent 68%);animation:bob 3s ease-in-out infinite;transition:transform .08s;-webkit-tap-highlight-color:transparent}
+#bake:active{transform:scale(.88) rotate(-4deg);animation:none}
+.fire #bake{filter:drop-shadow(0 0 28px var(--em))}
+.combo{width:220px;height:9px;margin:4px auto;background:#0005;border-radius:9px;overflow:hidden}
+#cb{height:100%;width:0;background:linear-gradient(90deg,var(--bt),var(--em));transition:width .1s}
+#strip{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;min-height:60px;margin-top:18px}
+#strip div{display:flex;flex-wrap:wrap;max-width:210px}
+#strip span{font-size:1.4rem;animation:pop .4s}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{flex:1;padding:9px 4px;border:0;border-radius:10px;background:var(--card);color:inherit;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
+.tab.on{background:var(--bt);color:#2a1b00}
+.panel{display:none;max-height:560px;overflow:auto;padding-right:4px}
+.panel.on{display:block}
+.qty{display:flex;gap:6px;margin-bottom:8px}
+.qty button{flex:1;padding:6px;border:0;border-radius:9px;background:var(--card);color:inherit;font:inherit;font-weight:700;cursor:pointer}
+.qty .on{background:var(--mint);color:#06281c}
+.row{display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;width:100%;margin-bottom:8px;padding:10px;border:2px solid transparent;border-radius:14px;background:var(--card);color:inherit;font:inherit;text-align:left;opacity:.55;cursor:not-allowed;transition:.15s}
+.row.ok{opacity:1;border-color:var(--bt);cursor:pointer}
+.row.ok:hover{transform:translateX(-4px);background:var(--card2)}
+.row .ic{font-size:2rem;text-align:center}
+.row small{display:block;opacity:.75}
+.cost{font-weight:800;color:var(--bt)}
+.box2{padding:18px;border-radius:14px;background:var(--card);line-height:1.5}
+.box2 p{margin:8px 0}
+.big{font-size:2rem;font-weight:800}
+.pri{padding:10px 18px;border:0;border-radius:12px;background:var(--bt);color:#2a1b00;font:inherit;font-weight:800;cursor:pointer}
+.pri:disabled{opacity:.4;cursor:not-allowed}
+.ach{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ach div{padding:10px;border-radius:12px;background:var(--card);opacity:.45;font-size:.88rem}
+.ach .got{opacity:1;border:2px solid var(--mint)}
+.empty{padding:20px;text-align:center;opacity:.8}
+.fl,.cr,.rs{position:fixed;pointer-events:none;z-index:50}
+.fl{font-weight:800;font-size:1.3rem;color:var(--bt);text-shadow:0 2px 4px #000;animation:fl .9s ease-out forwards}
+.cr{width:8px;height:8px;border-radius:50%;background:#e0a24a;animation:cr .6s ease-out forwards}
+.rs{font-size:1.2rem;opacity:.7;animation:rs 3s linear forwards}
+#gold{position:fixed;z-index:60;border:0;background:none;font-size:3.6rem;cursor:pointer;filter:drop-shadow(0 0 14px gold);animation:gl .9s ease-in-out infinite alternate}
+#toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:90}
+.toast{padding:10px 14px;border-radius:12px;background:var(--bt);color:#2a1b00;font-weight:700;animation:sl .35s}
+#modal{position:fixed;inset:0;display:none;place-items:center;background:#000b;z-index:100}
+#modal.on{display:grid}
+.box{width:90%;max-width:420px;padding:26px;border-radius:20px;background:var(--card);text-align:center;animation:pop .3s}
+#gi{font-size:4rem}
+.box h2{margin:6px 0}
+.box p{min-height:90px;line-height:1.5}
+#gd{display:flex;justify-content:center;gap:6px;margin:10px 0 16px}
+#gd i{width:8px;height:8px;border-radius:50%;background:#fff4}
+#gd .on{background:var(--bt);transform:scale(1.4)}
+.nav{display:flex;justify-content:space-between;align-items:center}
+#prev{border:0;background:none;color:inherit;font:inherit;cursor:pointer}
+@keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes pulse{50%{background:#ffd86b40}}
+@keyframes pop{from{transform:scale(0) rotate(-20deg)}}
+@keyframes fl{from{transform:translate(-50%,0)}to{transform:translate(-50%,-80px);opacity:0}}
+@keyframes cr{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+@keyframes rs{to{transform:translateY(-150px);opacity:0}}
+@keyframes gl{to{transform:scale(1.2) rotate(8deg)}}
+@keyframes sl{from{transform:translateX(120%)}}
+@media(max-width:860px){main{grid-template-columns:1fr}#bake{width:180px;height:180px;font-size:6rem}.panel{max-height:none}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+</style></head><body>
+<header><h1>🥖 Bakery Idle</h1><div><button class="ib" id="snd" title="Suara">🔊</button><button class="ib" id="help" title="Panduan">❓</button><button class="ib" id="reset" title="Hapus progres">🗑️</button></div></header>
+<div id="hint"></div>
+<main>
+<section class="left">
+<div id="bread">0</div><div class="sub">roti · <b id="cps">0</b> per detik</div><div id="buffs"></div>
+<button id="bake" aria-label="Panggang roti">🍞</button>
+<div class="combo"><div id="cb"></div></div><div id="ct" class="sub"></div>
+<div id="strip"></div>
+</section>
+<aside>
+<div class="tabs"><button class="tab on" data-p="pb">🏭 Bangunan</button><button class="tab" data-p="pu">⚡ Upgrade</button><button class="tab" data-p="py">✨ Ragi</button><button class="tab" data-p="pa">🏆 Prestasi</button></div>
+<div class="panel on" id="pb"><div class="qty"><button class="on" data-q="1">×1</button><button data-q="10">×10</button><button data-q="max">Max</button></div><div id="bl"></div></div>
+<div class="panel" id="pu"></div>
+<div class="panel" id="py"><div class="box2"><div class="big">✨ <span id="yc">0</span> Ragi Emas</div><p>Bonus produksi permanen: <b id="yb">+0%</b></p><p>Panggang ulang sekarang memberi <b id="yg">0</b> Ragi Emas (+5% produksi permanen untuk tiap ragi). Roti, bangunan, dan upgrade akan di-reset.</p><button id="presti" class="pri">🔄 Panggang Ulang</button></div></div>
+<div class="panel" id="pa"><div class="ach" id="al"></div></div>
+</aside></main>
+<div id="toasts"></div>
+<div id="modal"><div class="box"><div id="gi"></div><h2 id="gt"></h2><p id="gp"></p><div id="gd"></div><div class="nav"><button id="prev">← Kembali</button><button id="next" class="pri"></button></div></div></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const B=[
+{id:'oven',n:'Oven Mini',i:'♨️',c:15,p:.1},
+{id:'baker',n:'Tukang Roti',i:'🧑‍🍳',c:100,p:1},
+{id:'shop',n:'Toko Roti',i:'🏪',c:1100,p:8},
+{id:'fact',n:'Pabrik Roti',i:'🏭',c:12000,p:47},
+{id:'mill',n:'Ladang Gandum',i:'🌾',c:130000,p:260},
+{id:'city',n:'Kota Roti',i:'🏙️',c:1.4e6,p:1400}];
+const U=[
+{id:'u1',n:'Spatula Perak',i:'🥄',d:'Hasil klik ×2',c:100,t:'c',m:2},
+{id:'u2',n:'Resep Rahasia',i:'📜',d:'Semua produksi ×2',c:1000,t:'g',m:2},
+{id:'u3',n:'Spatula Emas',i:'🏅',d:'Hasil klik ×2',c:2500,t:'c',m:2},
+{id:'u4',n:'Tangan Ajaib',i:'🪄',d:'Klik +5% dari produksi/detik',c:1e4,t:'p'},
+{id:'u5',n:'Ragi Super',i:'🧪',d:'Semua produksi ×2',c:5e4,t:'g',m:2},
+{id:'u6',n:'Oven Turbo',i:'🚀',d:'Semua produksi ×2',c:1e6,t:'g',m:2}];
+const A=[
+{id:'a1',n:'Tukang Pemula',d:'Klik 50 kali',f:()=>S.clicks>=50},
+{id:'a2',n:'Jari Baja',d:'Klik 1.000 kali',f:()=>S.clicks>=1000},
+{id:'a3',n:'Pemilik Oven',d:'Punya 10 Oven Mini',f:()=>S.own.oven>=10},
+{id:'a4',n:'Juragan',d:'Total 10K roti',f:()=>S.total>=1e4},
+{id:'a5',n:'Jutawan Roti',d:'Total 1 juta roti',f:()=>S.total>=1e6},
+{id:'a6',n:'Pemburu Emas',d:'Klik 3 roti emas',f:()=>S.golden>=3},
+{id:'a7',n:'Kolektor',d:'Punya semua jenis bangunan',f:()=>B.every(b=>S.own[b.id]>0)},
+{id:'a8',n:'Ragi Pertama',d:'Panggang ulang sekali',f:()=>S.yeast>0}];
+const KEY='bakery-idle',fresh=()=>({bread:0,run:0,total:0,clicks:0,own:{},up:{},ach:{},yeast:0,golden:0,seen:0,t:Date.now(),snd:1});
+let S;try{S={...fresh(),...JSON.parse(localStorage.getItem(KEY))}}catch(e){S=fresh()}
+let combo=0,lastClick=0,buffEnd=0,qty=1,wipe=false,nextGold=Date.now()+20000;
+
+const suf=['','K','M','B','T','Qa','Qi'];
+function fmt(n){if(n<1000)return n>0&&n<10&&!Number.isInteger(n)?n.toFixed(1):''+Math.floor(n);const i=Math.floor(Math.log10(n)/3);return i<suf.length?(n/10**(3*i)).toFixed(2)+suf[i]:n.toExponential(2)}
+const frenzy=()=>Date.now()<buffEnd,yb=()=>1+S.yeast*.05;
+const gm=()=>{let m=yb();U.forEach(u=>{if(S.up[u.id]&&u.t=='g')m*=u.m});return m*(frenzy()?7:1)};
+const cps=()=>B.reduce((a,b)=>a+(S.own[b.id]||0)*b.p,0)*gm();
+const cmb=()=>1+Math.min(Math.floor(combo/10),5)*.1;
+function cv(){let m=1;U.forEach(u=>{if(S.up[u.id]&&u.t=='c')m*=u.m});let v=m*yb();if(S.up.u4)v+=cps()*.05;return v*cmb()*(frenzy()?7:1)}
+const price=(b,n)=>Math.ceil(b.c*1.15**(S.own[b.id]||0)*((1.15**n-1)/.15));
+function maxN(b){const o=S.own[b.id]||0;let n=0,t=0;for(;;){const c=b.c*1.15**(o+n);if(t+c>S.bread||n>=500)return n;t+=c;n++}}
+const bn=b=>qty==='max'?Math.max(1,maxN(b)):qty;
+const yg=()=>Math.floor(Math.sqrt(S.run/1e5));
+const add=g=>{S.bread+=g;S.run+=g;S.total+=g};
+
+let AC;function beep(f,d,v=.04){if(!S.snd)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(t+d)}catch(e){}}
+function fx(cls,txt,x,y,ms=900){const e=document.createElement('div');e.className=cls;e.textContent=txt;e.style.left=x+'px';e.style.top=y+'px';document.body.append(e);setTimeout(()=>e.remove(),ms)}
+function crumb(x,y){const e=document.createElement('i');e.className='cr';e.style.cssText=`left:${x}px;top:${y}px;--dx:${(Math.random()-.5)*140}px;--dy:${-20-Math.random()*90}px`;document.body.append(e);setTimeout(()=>e.remove(),600)}
+function toast(i,t){const e=document.createElement('div');e.className='toast';e.textContent=i+' '+t;$('#toasts').append(e);setTimeout(()=>e.remove(),3500)}
+const shake=r=>r.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:200});
+const bump=r=>r.animate([{transform:'scale(.95)'},{transform:'none'}],{duration:160});
+
+$('#bake').addEventListener('click',e=>{
+ const r=e.currentTarget.getBoundingClientRect(),x=(e.detail?e.clientX:r.left+r.width/2)+(Math.random()-.5)*30,y=e.detail?e.clientY:r.top+r.height/2;
+ combo=Math.min(combo+1,50);lastClick=Date.now();
+ const g=cv();add(g);S.clicks++;
+ fx('fl','+'+fmt(g),x,y);for(let i=0;i<6;i++)crumb(x,y);
+ beep(300+Math.random()*200,.05)});
+
+function build(){
+ $('#bl').innerHTML=B.map(b=>`<button class="row" data-b="${b.id}"><span class="ic">${b.i}</span><span><b>${b.n}</b> <em class="n"></em><small class="pp"></small></span><span class="cost"></span></button>`).join('');
+ $('#strip').innerHTML=B.map(b=>`<div data-s="${b.id}" title="${b.n}"></div>`).join('');
+ renderU();renderA();sync()}
+function sync(){B.forEach(b=>{const c=$(`[data-s=${b.id}]`),n=Math.min(S.own[b.id]||0,14);while(c.children.length<n){const s=document.createElement('span');s.textContent=b.i;c.append(s)}while(c.children.length>n)c.lastChild.remove()})}
+function renderU(){const l=U.filter(u=>!S.up[u.id]);$('#pu').innerHTML=l.length?l.map(u=>`<button class="row" data-u="${u.id}"><span class="ic">${u.i}</span><span><b>${u.n}</b><small>${u.d}</small></span><span class="cost">${fmt(u.c)}</span></button>`).join(''):'<p class="empty">Semua upgrade sudah dibeli! 🎉</p>'}
+function renderA(){$('#al').innerHTML=A.map(a=>`<div class="${S.ach[a.id]?'got':''}"><b>${S.ach[a.id]?'🏆':'🔒'} ${a.n}</b><br>${a.d}</div>`).join('')}
+
+$('#bl').addEventListener('click',e=>{const r=e.target.closest('[data-b]');if(!r)return;const b=B.find(x=>x.id==r.dataset.b),n=bn(b),c=price(b,n);
+ if(S.bread<c)return shake(r);S.bread-=c;S.own[b.id]=(S.own[b.id]||0)+n;beep(520,.12);sync();bump(r);upd()});
+$('#pu').addEventListener('click',e=>{const r=e.target.closest('[data-u]');if(!r)return;const u=U.find(x=>x.id==r.dataset.u);
+ if(S.bread<u.c)return shake(r);S.bread-=u.c;S.up[u.id]=1;beep(660,.15);toast('⚡',u.n+' dibeli!');renderU();upd()});
+$$('.qty button').forEach(b=>b.onclick=()=>{qty=b.dataset.q=='max'?'max':+b.dataset.q;$$('.qty button').forEach(x=>x.classList.toggle('on',x==b));upd()});
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab,.panel').forEach(e=>e.classList.remove('on'));t.classList.add('on');$('#'+t.dataset.p).classList.add('on')});
+$('#presti').onclick=()=>{const g=yg();if(g<1)return;
+ if(!confirm(`Panggang ulang? Kamu dapat +${g} Ragi Emas (+${g*5}% produksi permanen). Roti, bangunan, dan upgrade akan di-reset.`))return;
+ S.yeast+=g;S.bread=S.run=0;S.own={};S.up={};combo=0;sync();renderU();beep(880,.4);toast('✨','Panggang ulang! +'+g+' Ragi Emas');upd()};
+$('#snd').onclick=()=>{S.snd=S.snd?0:1;$('#snd').textContent=S.snd?'🔊':'🔇'};
+$('#reset').onclick=()=>{if(confirm('Hapus semua progres? Ini tidak bisa dibatalkan.')){wipe=true;localStorage.removeItem(KEY);location.reload()}};
+
+function spawnGold(){if($('#gold'))return;const g=document.createElement('button');g.id='gold';g.textContent='🌟';g.title='Klik cepat!';
+ g.style.left=10+Math.random()*80+'vw';g.style.top=15+Math.random()*65+'vh';
+ g.onclick=()=>{g.remove();S.golden++;beep(900,.3,.07);
+  if(Math.random()<.6){buffEnd=Date.now()+2e4;toast('🔥','Frenzy! Produksi ×7 selama 20 detik')}
+  else{const b=Math.max(cps()*90,50);add(b);toast('🌟','Bonus +'+fmt(b)+' roti!')}};
+ document.body.append(g);setTimeout(()=>g.remove(),13000)}
+function rise(){const r=$('#strip').getBoundingClientRect();fx('rs',['🍞','🥖','🥐'][Math.random()*3|0],r.left+Math.random()*r.width,r.top,3000)}
+
+function hint(){
+ if(S.clicks<10)return '👆 Klik roti besar untuk mulai memanggang!';
+ if(!S.own.oven)return '🏭 Kumpulkan 15 roti, lalu beli Oven Mini di tab Bangunan. Ia memanggang sendiri!';
+ if(!Object.keys(S.up).length)return '⚡ Buka tab Upgrade dan beli upgrade pertamamu (100 roti).';
+ if(!S.golden)return '🌟 Awas, roti emas akan muncul di layar. Klik cepat untuk bonus besar!';
+ if(yg()>=1)return '✨ Ragi Emas siap! Buka tab Ragi untuk mulai ulang dengan bonus permanen.';
+ return '🏆 Terus beli bangunan dan kejar semua prestasi. Game ini tidak ada akhirnya!'}
+
+function upd(){
+ const m=gm();
+ $$('[data-b]').forEach(r=>{const b=B.find(x=>x.id==r.dataset.b),n=bn(b),c=price(b,n);r.classList.toggle('ok',S.bread>=c);
+  r.querySelector('.n').textContent='×'+(S.own[b.id]||0);r.querySelector('.pp').textContent=`${fmt(b.p*m)} roti/dtk per unit · beli ${n}`;r.querySelector('.cost').textContent=fmt(c)});
+ $$('[data-u]').forEach(r=>r.classList.toggle('ok',S.bread>=U.find(x=>x.id==r.dataset.u).c));
+ const g=yg();$('#yc').textContent=S.yeast;$('#yb').textContent='+'+Math.round(S.yeast*5)+'%';$('#yg').textContent=g;$('#presti').disabled=g<1;
+ A.forEach(a=>{if(!S.ach[a.id]&&a.f()){S.ach[a.id]=1;toast('🏆',a.n);beep(784,.3,.06);renderA()}});
+ $('#hint').textContent=hint();document.title=fmt(Math.floor(S.bread))+' roti · Bakery Idle'}
+
+let last=performance.now(),acc=0;
+function tick(now){
+ const dt=Math.min((now-last)/1000,28800);last=now;
+ const c=cps();add(c*dt);
+ if(Date.now()-lastClick>700)combo=Math.max(0,combo-dt*12);
+ if(Date.now()>nextGold){spawnGold();nextGold=Date.now()+45000+Math.random()*45000}
+ if(c>0&&!document.hidden&&Math.random()<Math.min(dt*Math.log10(c+10)*1.5,.3))rise();
+ $('#bread').textContent=fmt(Math.floor(S.bread));$('#cps').textContent=fmt(c);
+ $('#cb').style.width=combo*2+'%';$('#ct').textContent=combo>=10?`Combo ×${cmb().toFixed(1)} untuk setiap klik`:'Klik cepat untuk mengisi combo';
+ const l=buffEnd-Date.now();$('#buffs').textContent=l>0?`🔥 Frenzy ×7 · ${Math.ceil(l/1000)} dtk`:'';document.body.classList.toggle('fire',l>0);
+ acc+=dt;if(acc>.25){acc=0;upd()}
+ requestAnimationFrame(tick)}
+
+const G=[
+['🥖','Selamat datang!','Kamu pemilik bakery kecil. Tujuanmu: panggang roti sebanyak-banyaknya. Game ini tidak ada akhirnya!'],
+['👆','Klik untuk memanggang','Klik roti besar untuk mendapat roti. Klik beruntun mengisi bar Combo dan menambah hasil klik hingga +50%.'],
+['🏭','Bangunan = produksi otomatis','Beli Oven, Tukang Roti, dan lainnya. Mereka memanggang sendiri, bahkan saat kamu menutup game. Harga naik 15% tiap pembelian. Pakai ×1, ×10, atau Max.'],
+['⚡','Upgrade permanen','Beli sekali, efeknya selamanya: klik jadi lebih kuat atau semua produksi berlipat ganda.'],
+['🌟','Roti Emas','Sesekali 🌟 muncul di layar. Klik sebelum hilang untuk Frenzy (produksi ×7) atau bonus roti besar.'],
+['✨','Ragi Emas & Prestasi','Kalau sudah kaya, pilih Panggang Ulang di tab Ragi: progres di-reset, tapi kamu dapat bonus produksi permanen. Progres tersimpan otomatis.']];
+let gi=0;
+function showG(i){gi=i;const g=G[i];$('#gi').textContent=g[0];$('#gt').textContent=g[1];$('#gp').textContent=g[2];
+ $('#gd').innerHTML=G.map((_,k)=>`<i class="${k==i?'on':''}"></i>`).join('');$('#prev').style.visibility=i?'visible':'hidden';$('#next').textContent=i==G.length-1?'Mulai! 🍞':'Lanjut →'}
+const closeG=()=>{$('#modal').classList.remove('on');S.seen=1;save()};
+$('#next').onclick=()=>gi<G.length-1?showG(gi+1):closeG();
+$('#prev').onclick=()=>showG(gi-1);
+$('#modal').onclick=e=>{if(e.target.id=='modal')closeG()};
+$('#help').onclick=()=>{showG(0);$('#modal').classList.add('on')};
+
+function save(){if(wipe)return;S.t=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+setInterval(save,10000);addEventListener('beforeunload',save);
+
+build();$('#snd').textContent=S.snd?'🔊':'🔇';
+const away=(Date.now()-S.t)/1000;
+if(S.seen&&away>60){const g=cps()*Math.min(away,28800)*.5;if(g>0){add(g);setTimeout(()=>toast('😴',`Offline ${Math.round(away/60)} menit: +${fmt(g)} roti`),700)}}
+if(!S.seen){showG(0);$('#modal').classList.add('on')}
+upd();requestAnimationFrame(tick);
+</script></body></html>
