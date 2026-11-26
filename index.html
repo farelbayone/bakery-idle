@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Toko Roti Manager</title>
+<style>
+:root{--bg:#1d1530;--card:#2a2045;--card2:#372b5a;--tx:#fff6e6;--bt:#ffd86b;--em:#ff6b4a;--mint:#6ee7b7}
+*{box-sizing:border-box;margin:0}
+body{font-family:ui-rounded,"SF Pro Rounded",Nunito,"Trebuchet MS",sans-serif;background:radial-gradient(circle at 25% -10%,#4a2f7a,var(--bg) 60%) fixed;color:var(--tx);min-height:100vh;overflow-x:hidden;user-select:none}
+header{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:12px 20px}
+h1{font-size:1.25rem;font-weight:800}
+.stats{display:flex;gap:18px;align-items:center;font-weight:800;font-size:1.1rem}
+.lv{min-width:110px}.lv .pt{margin:3px 0 0}
+.ib{width:40px;height:40px;margin-left:6px;border:0;border-radius:12px;background:var(--card);color:inherit;font-size:1.1rem;cursor:pointer;transition:.2s}
+.ib:hover{transform:translateY(-2px);background:var(--card2)}
+button:focus-visible{outline:3px solid var(--bt);outline-offset:2px}
+#hint{margin:0 20px;padding:10px 14px;border:1px dashed var(--bt);border-radius:12px;background:#ffd86b1f;font-size:.92rem;animation:pulse 2.6s infinite}
+main{display:grid;grid-template-columns:1fr 400px;gap:22px;max-width:1120px;margin:auto;padding:20px}
+.awn{height:34px;margin-bottom:12px;border-radius:0 0 18px 18px;background:repeating-linear-gradient(90deg,var(--em) 0 40px,var(--bt) 40px 80px);box-shadow:0 6px 0 #0004}
+h2{font-size:1rem;margin:14px 0 8px}
+#cus,#ov{display:flex;flex-wrap:wrap;gap:10px;min-height:120px}
+.empty{width:100%;padding:30px 10px;text-align:center;opacity:.7}
+.cu{position:relative;width:132px;padding:10px;border-radius:16px;background:var(--card);text-align:center;animation:pop .35s}
+.cu.vip{border:2px solid var(--bt);box-shadow:0 0 16px #ffd86b66}
+.fc{font-size:2.6rem}
+.bb{display:inline-block;margin:4px 0;padding:4px 9px;border-radius:12px;background:#fff;color:#2a1b00;font-weight:800}
+.cu small{display:block;opacity:.8}
+.pt{height:7px;margin:6px 0;border-radius:7px;background:#0006;overflow:hidden}
+.pt i{display:block;height:100%;width:100%;background:var(--mint)}
+.pt i.lo{background:var(--em)}
+.pri{padding:8px 12px;border:0;border-radius:12px;background:var(--bt);color:#2a1b00;font:inherit;font-weight:800;cursor:pointer;transition:.15s}
+.pri:hover:not(:disabled){transform:scale(1.06)}
+.pri:disabled{opacity:.45;cursor:not-allowed}
+.out{animation:out .3s forwards}
+.ov{width:104px;padding:10px;border-radius:14px;background:#0005;text-align:center;font-size:.85rem}
+.oe{display:block;font-size:2rem}
+.ov.on .oe{animation:bob 1s ease-in-out infinite}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{flex:1;padding:9px 4px;border:0;border-radius:10px;background:var(--card);color:inherit;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
+.tab.on{background:var(--bt);color:#2a1b00}
+.panel{display:none;max-height:600px;overflow:auto;padding-right:4px}
+.panel.on{display:block}
+.row{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;width:100%;margin-bottom:8px;padding:10px;border:2px solid transparent;border-radius:14px;background:var(--card);color:inherit;font:inherit;text-align:left;opacity:.55;cursor:pointer;transition:.15s}
+.row.ok{opacity:1;border-color:var(--bt)}
+.row.ok:hover{transform:translateX(-4px);background:var(--card2)}
+.row.lock{opacity:.35;cursor:not-allowed}
+.row .ic{font-size:2rem;text-align:center}
+.row small{display:block;opacity:.75}
+.cost{font-weight:800;color:var(--bt)}
+.top{padding:14px;border-radius:14px;background:var(--card);line-height:1.6}
+.top button{margin:6px 6px 0 0;padding:6px 10px;border:0;border-radius:9px;background:var(--card2);color:inherit;font:inherit;cursor:pointer}
+ol{margin:10px 0 0 22px}
+.fl,.cr{position:fixed;pointer-events:none;z-index:50}
+.fl{font-weight:800;font-size:1.3rem;color:var(--bt);text-shadow:0 2px 4px #000;animation:fl .9s ease-out forwards}
+#toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:90}
+.toast{padding:10px 14px;border-radius:12px;background:var(--bt);color:#2a1b00;font-weight:700;animation:sl .35s}
+#modal{position:fixed;inset:0;display:none;place-items:center;background:#000b;z-index:100}
+#modal.on{display:grid}
+.box{width:90%;max-width:420px;padding:26px;border-radius:20px;background:var(--card);text-align:center;animation:pop .3s}
+#gi{font-size:4rem}
+.box p{min-height:96px;line-height:1.5}
+#gd{display:flex;justify-content:center;gap:6px;margin:10px 0 16px}
+#gd i{width:8px;height:8px;border-radius:50%;background:#fff4}
+#gd .on{background:var(--bt);transform:scale(1.4)}
+.nav{display:flex;justify-content:space-between;align-items:center}
+#prev{border:0;background:none;color:inherit;font:inherit;cursor:pointer}
+@keyframes bob{50%{transform:translateY(-5px)}}
+@keyframes pulse{50%{background:#ffd86b40}}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+@keyframes out{to{transform:scale(.5) translateY(-20px);opacity:0}}
+@keyframes fl{from{transform:translate(-50%,0)}to{transform:translate(-50%,-70px);opacity:0}}
+@keyframes sl{from{transform:translateX(120%)}}
+@media(max-width:860px){main{grid-template-columns:1fr}.panel{max-height:none}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+</style></head><body>
+<header><h1>🥐 Toko Roti Manager</h1>
+<div class="stats"><div>🪙 <span id="co">0</span></div><div class="lv">⭐ Lv <span id="lv">1</span><div class="pt"><i id="xb"></i></div></div><div title="Layani tanpa ada yang kecewa">🔥 <span id="sk">×0</span></div></div>
+<div><button class="ib" id="snd">🔊</button><button class="ib" id="help">❓</button><button class="ib" id="reset">🗑️</button></div></header>
+<div id="hint"></div>
+<main>
+<section><div class="awn"></div>
+<h2>🙋 Antrean pelanggan</h2><div id="cus"></div>
+<h2>♨️ Oven</h2><div id="ov"></div></section>
+<aside>
+<div class="tabs"><button class="tab on" data-p="pm">🥖 Menu</button><button class="tab" data-p="pu">⚡ Upgrade</button><button class="tab" data-p="pl">🏆 Peringkat</button></div>
+<div class="panel on" id="pm"></div>
+<div class="panel" id="pu"></div>
+<div class="panel" id="pl"><div class="top"><div>Namamu: <b id="nm"></b></div><div id="ne"></div><button id="rn">✏️ Ganti nama</button><button id="rk">🔑 Kode simpan</button><ol id="tl"></ol></div></div>
+</aside></main>
+<div id="toasts"></div>
+<div id="modal"><div class="box"><div id="gi"></div><h2 id="gt"></h2><p id="gp"></p><div id="gd"></div><div class="nav"><button id="prev">← Kembali</button><button id="next" class="pri"></button></div></div></div>
+<script>
+const API=''; // isi dengan URL Cloudflare Worker-mu, mis. 'https://bakery-api.namamu.workers.dev'
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const BR=[
+{id:'tawar',n:'Roti Tawar',e:'🍞',c:9,p:8,t:5,l:1},
+{id:'coklat',n:'Roti Coklat',e:'🍫',c:20,p:16,t:7,l:2},
+{id:'croi',n:'Croissant',e:'🥐',c:36,p:28,t:9,l:3},
+{id:'donat',n:'Donat',e:'🍩',c:60,p:44,t:11,l:4},
+{id:'bagel',n:'Bagel',e:'🥯',c:100,p:70,t:13,l:5},
+{id:'bague',n:'Baguette',e:'🥖',c:160,p:110,t:15,l:6},
+{id:'pret',n:'Pretzel',e:'🥨',c:260,p:175,t:17,l:8},
+{id:'cup',n:'Cupcake',e:'🧁',c:420,p:280,t:19,l:10},
+{id:'panc',n:'Pancake',e:'🥞',c:700,p:460,t:22,l:12},
+{id:'tart',n:'Pie Buah',e:'🥧',c:1200,p:780,t:25,l:14},
+{id:'cake',n:'Kue Ulang Tahun',e:'🎂',c:2200,p:1400,t:30,l:17}];
+const UP=[
+{id:'oven',n:'Tambah Oven',i:'♨️',d:'+1 slot oven',b:120,g:2.4,m:5},
+{id:'speed',n:'Oven Turbo',i:'⚡',d:'Panggang 10% lebih cepat',b:150,g:1.9,m:8},
+{id:'pat',n:'Kursi Nyaman',i:'🪑',d:'Pelanggan 20% lebih sabar',b:100,g:1.8,m:8},
+{id:'mkt',n:'Promosi',i:'📣',d:'Pelanggan datang 15% lebih sering',b:200,g:1.8,m:10},
+{id:'queue',n:'Perluas Toko',i:'🏬',d:'+1 kursi antrean',b:250,g:2,m:5},
+{id:'price',n:'Display Cantik',i:'✨',d:'Harga jual +5%',b:300,g:1.9,m:10},
+{id:'auto',n:'Asisten Baker',i:'🧑‍🍳',d:'Memanggang otomatis saat oven kosong',b:900,g:1,m:1}];
+const KEY='toko-roti',rid=()=>crypto.randomUUID?crypto.randomUUID():'p'+Date.now()+Math.random().toString(36).slice(2);
+const fresh=()=>({coin:60,xp:0,earned:0,served:0,stock:{},ovens:[null],up:{},seen:0,snd:1,t:0,name:'Baker'+(1000+Math.random()*9000|0),id:rid()});
+let S;try{S={...fresh(),...JSON.parse(localStorage.getItem(KEY))}}catch(e){S=fresh()}
+let C=[],streak=0,wipe=false,nextC=Date.now()+1500,lastT=Date.now(),lastL=0,cid=0;
+
+const suf=['','K','M','B','T','Qa'];
+function fmt(n){if(n<1000)return''+Math.floor(n);const i=Math.floor(Math.log10(n)/3);return i<suf.length?(n/10**(3*i)).toFixed(2)+suf[i]:n.toExponential(2)}
+const L=()=>1+Math.floor(Math.sqrt(S.xp/12)),lb=l=>(l-1)**2*12;
+const ul=id=>S.up[id]||0,stk=id=>S.stock[id]||0,unl=()=>BR.filter(b=>b.l<=L());
+const bakeT=b=>b.t*1000*.9**ul('speed'),priceOf=b=>Math.round(b.p*(1+ul('price')*.05));
+const pat=()=>25000*(1+ul('pat')*.2),maxQ=()=>3+ul('queue'),rate=()=>6000/(1+ul('mkt')*.15);
+const upCost=u=>Math.ceil(u.b*u.g**ul(u.id));
+const fixOv=()=>{while(S.ovens.length<1+ul('oven'))S.ovens.push(null)};
+
+let AC;function beep(f,d,v=.04){if(!S.snd)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(t+d)}catch(e){}}
+function fx(txt,x,y){const e=document.createElement('div');e.className='fl';e.textContent=txt;e.style.left=x+'px';e.style.top=y+'px';document.body.append(e);setTimeout(()=>e.remove(),900)}
+function toast(i,t){const e=document.createElement('div');e.className='toast';e.textContent=i+' '+t;$('#toasts').append(e);setTimeout(()=>e.remove(),3200)}
+const shake=r=>r.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:200});
+
+/* ===== Pelanggan ===== */
+function spawn(){
+ const u=unl(),b=u[Math.floor(Math.random()**1.5*u.length)],vip=Math.random()<.12;
+ const q=Math.ceil(Math.random()*Math.min(3,1+Math.floor(L()/3))),mul=q*(vip?2:1);
+ const c={id:++cid,b,q,vip,t0:Date.now(),pat:pat()};
+ const el=document.createElement('div');el.className='cu'+(vip?' vip':'');
+ el.innerHTML=`<div class="fc">${vip?'🤩':['🙂','😀','😎','🧑‍🦰','👵','👨‍🎓','👩‍💼','🧒'][Math.random()*8|0]}</div><div class="bb">${b.e} ×${q}</div><small>${vip?'⭐ VIP · ':''}🪙 ${fmt(priceOf(b)*mul)}</small><div class="pt"><i></i></div><button class="pri">Layani</button>`;
+ c.el=el;c.bar=el.querySelector('i');c.btn=el.querySelector('button');c.mul=mul;
+ c.btn.onclick=e=>serve(c,e);$('#cus').append(el);C.push(c);beep(700,.08,.03);emptyMsg()}
+function drop(c){C=C.filter(x=>x!=c);c.el.classList.add('out');setTimeout(()=>{c.el.remove();emptyMsg()},300)}
+function serve(c,e){
+ if(stk(c.b.id)<c.q)return shake(c.el);
+ S.stock[c.b.id]-=c.q;streak++;
+ const left=Math.max(0,1-(Date.now()-c.t0)/c.pat),pay=Math.round(priceOf(c.b)*c.mul*(1+left*.5)*(1+Math.min(streak,25)*.02));
+ S.coin+=pay;S.earned+=pay;S.served++;S.xp+=c.mul;
+ const r=c.btn.getBoundingClientRect();fx('+'+fmt(pay)+' 🪙'+(left>.6?' 💖':''),r.left+r.width/2,r.top);
+ beep(600+Math.min(streak,12)*30,.12);drop(c);upd()}
+function emptyMsg(){const e=$('#cus .empty');if(!C.length&&!e)$('#cus').insertAdjacentHTML('afterbegin','<div class="empty">Menunggu pelanggan datang… 🚪</div>');if(C.length&&e)e.remove()}
+
+/* ===== Oven & menu ===== */
+function bake(b,silent){
+ if(b.l>L())return;const i=S.ovens.indexOf(null);
+ if(i<0){if(!silent)toast('♨️','Semua oven penuh. Tunggu atau beli oven baru.');return false}
+ if(S.coin<b.c){if(!silent)toast('🪙','Uang untuk bahan kurang.');return false}
+ const d=bakeT(b);S.coin-=b.c;S.ovens[i]={b:b.id,end:Date.now()+d,dur:d};beep(420,.1);upd();return true}
+function renderOv(){fixOv();$('#ov').innerHTML=S.ovens.map(()=>'<div class="ov"><span class="oe">♨️</span><span class="ot">Kosong</span><div class="pt"><i style="width:0"></i></div></div>').join('')}
+function buildLists(){
+ $('#pm').innerHTML=BR.map(b=>`<button class="row" data-m="${b.id}"><span class="ic">${b.e}</span><span><b>${b.n}</b> <em class="n"></em><small></small></span><span class="cost">🪙 ${fmt(b.c)}</span></button>`).join('');
+ $('#pu').innerHTML=UP.map(u=>`<button class="row" data-u="${u.id}"><span class="ic">${u.i}</span><span><b>${u.n}</b> <em class="n"></em><small>${u.d}</small></span><span class="cost"></span></button>`).join('')}
+$('#pm').addEventListener('click',e=>{const r=e.target.closest('[data-m]');if(!r)return;const b=BR.find(x=>x.id==r.dataset.m);if(b.l>L())return shake(r);if(!bake(b))shake(r)});
+$('#pu').addEventListener('click',e=>{const r=e.target.closest('[data-u]');if(!r)return;const u=UP.find(x=>x.id==r.dataset.u),c=upCost(u);
+ if(ul(u.id)>=u.m||S.coin<c)return shake(r);S.coin-=c;S.up[u.id]=ul(u.id)+1;fixOv();renderOv();beep(660,.15);toast('⚡',u.n+' ditingkatkan!');upd()});
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab,.panel').forEach(e=>e.classList.remove('on'));t.classList.add('on');$('#'+t.dataset.p).classList.add('on');if(t.dataset.p=='pl')sync()});
+
+function hint(){
+ const baking=S.ovens.some(Boolean),has=BR.some(b=>stk(b.id)>0);
+ if(!S.served){return has?'🙋 Roti sudah siap! Klik Layani pada pelanggan yang menunggu.':baking?'⏳ Roti sedang dipanggang di oven. Sebentar lagi siap!':'🥖 Mulai di sini: klik Roti Tawar di tab Menu untuk memanggang satu batch (isi 3).'}
+ if(C.some(c=>stk(c.b.id)<c.q))return '😟 Ada pelanggan memesan roti yang stoknya kurang. Panggang sekarang!';
+ if(UP.some(u=>ul(u.id)<u.m&&S.coin>=upCost(u)))return '⚡ Uangmu cukup untuk upgrade baru di tab Upgrade.';
+ return '🔥 Layani pelanggan cepat dan tanpa ada yang kecewa untuk bonus streak hingga +50%.'}
+
+function upd(){
+ fixOv();const l=L();
+ if(lastL&&l>lastL){const n=BR.find(b=>b.l==l);toast('⭐','Level '+l+(n?' · Menu baru: '+n.n+' '+n.e:''));beep(880,.4,.06)}lastL=l;
+ BR.forEach(b=>{const r=$(`[data-m=${b.id}]`),lock=b.l>l;r.classList.toggle('lock',lock);r.classList.toggle('ok',!lock&&S.coin>=b.c&&S.ovens.includes(null));
+  r.querySelector('.n').textContent=lock?'🔒 Level '+b.l:'stok '+stk(b.id);r.querySelector('small').textContent=lock?'Naik level dengan melayani pelanggan':`jual ${fmt(priceOf(b))}/pcs · ${Math.round(bakeT(b)/1000)} dtk · isi 3`});
+ UP.forEach(u=>{const r=$(`[data-u=${u.id}]`),v=ul(u.id),mx=v>=u.m,c=upCost(u);r.classList.toggle('ok',!mx&&S.coin>=c);
+  r.querySelector('.n').textContent=u.m>1?`Lv ${v}/${u.m}`:(v?'✔':'');r.querySelector('.cost').textContent=mx?'MAX':'🪙 '+fmt(c)});
+ if(ul('auto')&&S.ovens.includes(null)){const pend=id=>S.ovens.filter(o=>o&&o.b==id).length*3;
+  const cand=unl().filter(b=>S.coin>=b.c&&stk(b.id)+pend(b.id)<6).sort((a,b)=>stk(a.id)+pend(a.id)-stk(b.id)-pend(b.id)||b.p-a.p)[0];if(cand)bake(cand,true)}
+ C.forEach(c=>{const ok=stk(c.b.id)>=c.q;c.btn.disabled=!ok;c.btn.textContent=ok?'Layani':'Stok kurang'});
+ $('#hint').textContent=hint();document.title=fmt(S.coin)+' 🪙 · Toko Roti'}
+
+function tick(){
+ const now=Date.now(),gap=now-lastT;lastT=now;
+ if(gap>1500){C.forEach(c=>c.t0+=gap);nextC+=gap}
+ S.ovens.forEach((o,i)=>{if(o&&now>=o.end){S.stock[o.b]=stk(o.b)+3;S.ovens[i]=null;const b=BR.find(x=>x.id==o.b),el=$$('.ov')[i].getBoundingClientRect();fx('+3 '+b.e,el.left+el.width/2,el.top);beep(520,.15);upd()}});
+ $$('.ov').forEach((el,i)=>{const o=S.ovens[i];el.classList.toggle('on',!!o);el.querySelector('.oe').textContent=o?BR.find(b=>b.id==o.b).e:'♨️';el.querySelector('.ot').textContent=o?Math.ceil((o.end-now)/1000)+' dtk':'Kosong';el.querySelector('i').style.width=o?(1-(o.end-now)/o.dur)*100+'%':'0'});
+ C.slice().forEach(c=>{const p=(now-c.t0)/c.pat;c.bar.style.width=Math.max(0,1-p)*100+'%';c.bar.classList.toggle('lo',p>.7);
+  if(p>=1){streak=0;toast('😞','Pelanggan pergi kecewa. Streak hilang.');drop(c)}});
+ if(C.length<maxQ()&&now>nextC){spawn();nextC=now+rate()*(.6+Math.random()*.8)}
+ const l=L(),a=lb(l),b=lb(l+1);
+ $('#co').textContent=fmt(S.coin);$('#lv').textContent=l;$('#xb').style.width=(S.xp-a)/(b-a)*100+'%';
+ $('#sk').textContent='×'+streak+(streak?` (+${Math.min(streak,25)*2}%)`:'');
+ requestAnimationFrame(tick)}
+
+/* ===== Backend (opsional, tanpa login) ===== */
+const api=async(p,o)=>{if(!API)throw 0;const r=await fetch(API+p,o);if(!r.ok)throw 0;return r.json()};
+function renderTop(t){$('#ne').textContent=API?'':'Backend belum diatur (lihat README). Game tetap jalan offline.';
+ $('#tl').innerHTML=(t||[]).map(x=>`<li${x.name==S.name?' style="color:var(--bt)"':''}>${esc(x.name)} · 🪙 ${fmt(x.score)}</li>`).join('')}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function sync(){$('#nm').textContent=S.name;if(!API)return renderTop([]);save();
+ api('/save/'+S.id,{method:'PUT',body:JSON.stringify(S)}).catch(()=>{});
+ api('/score',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:S.id,name:S.name,score:S.earned})}).then(renderTop).catch(()=>api('/top').then(renderTop).catch(()=>{}))}
+async function cloud(){try{const r=await api('/save/'+S.id);if(r&&r.t>S.t){Object.assign(S,r,{id:S.id});renderOv();upd()}}catch(e){}}
+$('#rn').onclick=()=>{const n=prompt('Nama baru (maks 16 huruf):',S.name);if(n&&n.trim()){S.name=n.trim().slice(0,16);sync()}};
+$('#rk').onclick=()=>{const k=prompt('Kode simpanmu (salin untuk main di perangkat lain). Tempel kode lain untuk memuat progres itu:',S.id);
+ if(k&&k.trim()!=S.id&&/^[\w-]{8,40}$/.test(k.trim())){S.id=k.trim();S.t=0;save();location.reload()}};
+
+/* ===== Panduan ===== */
+const G=[
+['🥐','Selamat datang, Manajer!','Kamu mengelola toko roti. Pelanggan datang dan memesan roti. Layani sebanyak mungkin, naik level, dan buka menu baru. Tanpa akhir!'],
+['♨️','Panggang di oven','Buka tab Menu, klik roti untuk memanggang satu batch (isi 3). Bahan butuh uang, dan oven butuh waktu. Roti jadi akan masuk ke stok.'],
+['🙋','Layani pelanggan','Tiap pelanggan membawa pesanan dan bar kesabaran. Klik Layani sebelum bar habis. Makin cepat, makin besar tip. Layani beruntun untuk streak 🔥 hingga +50%. VIP ⭐ membayar dua kali lipat!'],
+['⚡','Upgrade tokomu','Beli oven, mesin lebih cepat, kursi nyaman, promosi, dan Asisten Baker yang memanggang otomatis saat kamu sibuk melayani.'],
+['🏆','Peringkat tanpa login','Progres tersimpan otomatis di browser. Jika backend aktif, namamu masuk papan peringkat global dan progres bisa dipindah lewat Kode simpan. Tidak perlu daftar.']];
+let gi=0;
+function showG(i){gi=i;const g=G[i];$('#gi').textContent=g[0];$('#gt').textContent=g[1];$('#gp').textContent=g[2];
+ $('#gd').innerHTML=G.map((_,k)=>`<i class="${k==i?'on':''}"></i>`).join('');$('#prev').style.visibility=i?'visible':'hidden';$('#next').textContent=i==G.length-1?'Buka toko! 🥐':'Lanjut →'}
+const closeG=()=>{$('#modal').classList.remove('on');S.seen=1;save()};
+$('#next').onclick=()=>gi<G.length-1?showG(gi+1):closeG();
+$('#prev').onclick=()=>showG(gi-1);
+$('#modal').onclick=e=>{if(e.target.id=='modal')closeG()};
+$('#help').onclick=()=>{showG(0);$('#modal').classList.add('on')};
+$('#snd').onclick=()=>{S.snd=S.snd?0:1;$('#snd').textContent=S.snd?'🔊':'🔇'};
+$('#reset').onclick=()=>{if(confirm('Hapus semua progres? Ini tidak bisa dibatalkan.')){wipe=true;localStorage.removeItem(KEY);location.reload()}};
+
+function save(){if(wipe)return;S.t=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+setInterval(save,10000);setInterval(()=>{if(API)sync()},45000);addEventListener('beforeunload',save);
+
+buildLists();renderOv();$('#snd').textContent=S.snd?'🔊':'🔇';$('#nm').textContent=S.name;renderTop([]);
+if(!S.seen){showG(0);$('#modal').classList.add('on')}
+emptyMsg();upd();cloud();if(API)api('/top').then(renderTop).catch(()=>{});requestAnimationFrame(tick);
+</script></body></html>
