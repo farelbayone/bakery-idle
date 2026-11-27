@@ -1,15 +1,15 @@
 # 🥐 Toko Roti Manager
 
-> A cozy bakery management game. Bake from a menu of 11 breads, serve customers before they lose patience, upgrade your shop, and climb the global leaderboard. No login, just open the link and play.
+> A cozy bakery management game. Bake from a menu of 13 breads, serve customers before they lose patience, upgrade your shop, and climb the global leaderboard. No login, just open the link and play.
 
 **Fullstack, yet free to host:** the game runs on **GitHub Pages**, and an optional tiny **Cloudflare Worker** adds the global leaderboard and anonymous cloud save. Without the backend, the game still works fully offline.
 
 ## ✨ Features
 
 - **Customer system:** customers arrive with orders and a patience bar. Serve fast for tips, chain a streak for up to +50%, and watch for VIPs who pay double.
-- **11 breads to unlock:** from Roti Tawar to Birthday Cake. Level up by serving customers to unlock new menu items.
+- **13 breads to unlock:** from Roti Tawar to Birthday Cake. Level up by serving customers to unlock new menu items.
 - **Oven management:** every bake costs ingredients and time. Buy more ovens and speed them up.
-- **7 shop upgrades:** ovens, speed, patience, promotion, queue size, prices, and an auto-baking Baker Assistant.
+- **10 shop upgrades:** ovens, speed, patience, promotion, queue size, prices, and an auto-baking Baker Assistant.
 - **Global leaderboard:** anonymous nickname, rename anytime.
 - **Cloud save without an account:** a random save code is generated in your browser. Copy it to continue on another device.
 - **Smooth UX:** animations, floating rewards, sound effects (mutable), an interactive tutorial, a contextual hint bar, responsive layout.
@@ -49,3 +49,12 @@ HTML5 · CSS3 · Vanilla JavaScript · Web Audio API · localStorage · Cloudfla
 ## 📄 License
 
 MIT
+
+## 🆕 v2 Overhaul
+Day/night cycle, kneading + perfect-timing oven collection, burnt bread, multi-item orders, food critics, random events (rush hour, festival), auto cashier, prestige "new branch" stars, achievements, confetti and many animations.
+
+---
+Made by **Farel Bayone Meijabar**
+
+## 🆕 v2.1
+Decoration shop (7 permanent items with bonuses), procedural ambient music (🎵 button), daily challenge quests with a streak bonus.
